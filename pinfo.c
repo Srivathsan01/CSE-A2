@@ -10,7 +10,6 @@
 
 void pinfo(char* id)
 {
-    printf("Hello %s\n",id);
     char procpath[30] = "/proc/",exepath[20]="", statpath[] = "/stat";
     strcat(procpath,id);
     strcpy(exepath,procpath);

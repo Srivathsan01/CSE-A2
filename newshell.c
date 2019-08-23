@@ -8,8 +8,8 @@
 #include <sys/utsname.h>
 #include <pwd.h>
 #include <string.h>
-#include<dirent.h>
-
+#include <dirent.h>
+#include <wait.h>
 int main()
 {
     struct utsname udata;
@@ -25,8 +25,11 @@ int main()
     int HOMELEN = strlen(homedir);
     strcpy(curdir, homedir);
     curdir[strlen(homedir)] = '\0';
+    int numchildproc=0;
     while (1)
     {
+        int childprocid[30];                        //Array having all child pid's
+        char childprocesses[30][20];                  //Array containing all names of child processes
         char *temp = (char *)calloc(50, sizeof(char));
         char **commandsarray = (char **)calloc(10000, sizeof(char *));
         for (int i = 0; i < 20; i++)
@@ -221,12 +224,48 @@ int main()
             }
             else
             {
-                printf("Command not Found: %s\n", commandsarray[i]);
+                char **F = (char **)calloc(10, sizeof(char *));
+                char *spi = (char *)malloc(80*sizeof(char));  int b=0;
+                spi=strtok(commandsarray[i]," ");
+                while(spi != NULL)
+                {
+                    F[b]=spi;
+                    b++;
+                    spi = strtok(NULL," ");
+                }
+                char syscommand[30];
+                strcpy(syscommand,F[0]);
+                if(b > 1)
+                    {
+                        if(strcmp(F[1],"&")==0)
+                        {
+                        int r= systemcommand(syscommand,1);
+                        childprocid[numchildproc]=r;           //Storing one more child pid
+                        strcpy(childprocesses[numchildproc] , F[0]);
+                        numchildproc++;
+                        }
+                    }
+                else
+                {
+                    systemcommand(syscommand,0);               
+                }
+                
             }
+        int status;
+        for(int f=0; f < numchildproc ; f++)
+            {
+                waitpid(-1,&status, WNOHANG | WUNTRACED);       // Return if no child exits or child stops
+                if(WIFEXITED(status))
+                {
+                 fprintf(stderr, "%s with pid %d exited normally\n" ,childprocesses[f] , childprocid[f]);
+                }
+            }
+
             // printf("Current path %s\n",getcwd(temp,100));
         }
         // currentdir(curdir);
         free(commandsarray);
+        
     }
     return 0;
 }
