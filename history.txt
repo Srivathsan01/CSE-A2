@@ -1,8 +1,3 @@
-history
-cd A2
-cd tempo
-cd A2
-ls
 cd ./tempo
 lscd ..ls
 clear
@@ -18,3 +13,8 @@ lspwdcd ./tempo
 cd A2
 lsclearls
 pwd
+ls -l &pwdls
+cd ./tempo
+pwdpinfovim &
+echo
+echo "Srivathsan"
