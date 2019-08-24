@@ -6,8 +6,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include <sys/utsname.h>
-#include<signal.h>
-#include<sys/wait.h>    
+#include <signal.h>
+#include <sys/wait.h>    
+
 int systemcommand(char **syscom,int flag)
 {
     char **argu = syscom;
@@ -26,7 +27,9 @@ int systemcommand(char **syscom,int flag)
         {
             setpgid(0,0);       
             // printf("pid = %d\n",getpid());
-            execvp(argu[0],argu);            //Child execvp(command)
+            int d=execvp(argu[0],argu);            //Child execvp(command)
+            if (d== -1)
+                printf("command not found: %s\n",syscom[0]);
         }
         else if(ind > 0)
         {
@@ -43,7 +46,9 @@ int systemcommand(char **syscom,int flag)
         if(ind ==0)
         {
             // printf("I am child going into %s\n",syscom);
-            execvp(argu[0],argu);
+            int d=execvp(argu[0],argu);
+              if (d== -1)
+                printf("command not found: %s\n",syscom[0]);
         }
         else
         {

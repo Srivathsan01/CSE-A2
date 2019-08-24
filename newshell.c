@@ -21,10 +21,29 @@ int main()
     char homedir[100];
     char username[30];
     gethostname(username, 30);
-    getcwd(homedir,100);
+    realpath("/home/srivathsan/Desktop/CSE/A2",homedir);
     int HOMELEN=strlen(homedir);
-    strcpy(curdir, homedir);
-    curdir[HOMELEN] = '\0';
+    char dum[100];
+    getcwd(dum,100);
+    if(strlen(dum) < HOMELEN)
+        strcpy(curdir,dum);
+    else if(strlen(dum) == HOMELEN)
+    {
+        int fr=0;
+        for(int l=0;l<HOMELEN;l++)
+            {
+                if(dum[l] != homedir[l])
+                    {fr=1; break;}
+            }
+        if(fr == 1)
+        strcpy(curdir, dum);
+        else
+        {strcpy(curdir,homedir);        
+        curdir[HOMELEN] = '\0';}
+    }
+    else
+        strcpy(curdir,dum);
+        
     int numchildproc=0;
     while (1)
     {

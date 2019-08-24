@@ -1,0 +1,20 @@
+history
+cd A2
+cd tempo
+cd A2
+ls
+cd ./tempo
+lscd ..ls
+clear
+cd ./tempocd tempocd ..
+cd tempo
+pwdpwspwd
+pws
+pwdpwspwd
+pws
+pwdpwsls
+pwd
+lspwdcd ./tempo
+cd A2
+lsclearls
+pwd
