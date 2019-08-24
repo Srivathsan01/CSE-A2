@@ -21,10 +21,10 @@ int main()
     char homedir[100];
     char username[30];
     gethostname(username, 30);
-    getcwd(homedir, 100);
-    int HOMELEN = strlen(homedir);
+    getcwd(homedir,100);
+    int HOMELEN=strlen(homedir);
     strcpy(curdir, homedir);
-    curdir[strlen(homedir)] = '\0';
+    curdir[HOMELEN] = '\0';
     int numchildproc=0;
     while (1)
     {
@@ -56,6 +56,9 @@ int main()
             for(int rock = strlen(commandsarray[i]) - 1; rock > 0; rock-- )
                 if(commandsarray[i][rock] != ' ')
                     {commandsarray[i][rock+1]= '\0';break;}
+
+                addtohistory(commandsarray[i]);
+
             if (strcmp(commandsarray[i], "pwd") == 0)
             {
                 char *b = (char *)malloc(100 * sizeof(char));
@@ -222,42 +225,60 @@ int main()
                 char *u = &(commandsarray[i][5]);
                 printf("\"%s\"\n", u);
             }
+            else if( strcmp(commandsarray[i], "history") == 0)
+            {
+                readhistory();
+            }
             else
             {
                 char **F = (char **)calloc(10, sizeof(char *));
                 char *spi = (char *)malloc(80*sizeof(char));  int b=0;
+                int amper=0;
                 spi=strtok(commandsarray[i]," ");
                 while(spi != NULL)
                 {
                     F[b]=spi;
                     b++;
+                    if(strcmp(spi,"&") == 0)
+                    amper=1;
                     spi = strtok(NULL," ");
                 }
                 char syscommand[30];
                 strcpy(syscommand,F[0]);
                 if(b > 1)
                     {
-                        if(strcmp(F[1],"&")==0)
+                        if(amper == 1)
                         {
-                        int r= systemcommand(syscommand,1);
+                        int r= systemcommand(F,1);
                         childprocid[numchildproc]=r;           //Storing one more child pid
                         strcpy(childprocesses[numchildproc] , F[0]);
                         numchildproc++;
                         }
+                        else
+                        {
+                            systemcommand(F,0);
+                        }
+                        
                     }
                 else
                 {
-                    systemcommand(syscommand,0);               
+                    systemcommand(F,0);               
                 }
                 
             }
         int status;
+        int retid;
         for(int f=0; f < numchildproc ; f++)
             {
-                waitpid(-1,&status, WNOHANG | WUNTRACED);       // Return if no child exits or child stops
-                if(WIFEXITED(status))
-                {
-                 fprintf(stderr, "%s with pid %d exited normally\n" ,childprocesses[f] , childprocid[f]);
+                if ((retid=waitpid(childprocid[f],&status, WNOHANG | WUNTRACED)) > 0) {       // Return if no child exits or child stops
+                    if(WIFEXITED(status))
+                    {
+                     fprintf(stderr, "%s with pid %d exited normally\n" ,childprocesses[f] ,retid) ;
+                    }
+                    if(WIFSIGNALED(status))
+                    {
+                        fprintf(stderr, "%s with pid %d exited due to a signal", childprocesses[f],childprocid[f]);
+                    }
                 }
             }
 
