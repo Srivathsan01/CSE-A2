@@ -8,6 +8,6 @@
 
 char* currentdir(char *s)
 {
-    getcwd(s,100);
+    getcwd(s,200);
     return s;
 }
